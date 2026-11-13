@@ -17,7 +17,7 @@ public class GameCommandTests
         var queue = new Queue<ICommand>();
 
         var cmd = new Mock<ICommand>();
-        cmd.Setup(c => c.Execute()).Callback(() => {}).Verifiable();
+        cmd.Setup(c => c.Execute()).Callback(() => { }).Verifiable();
 
         var runCommandsStrategy = new Mock<IStrategy>();
         runCommandsStrategy.Setup(s => s.RunStrategy(It.IsAny<Queue<ICommand>>())).Returns(cmd.Object).Verifiable();

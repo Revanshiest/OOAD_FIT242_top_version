@@ -18,9 +18,9 @@ public class CreateCommandStrategyTests
 
         var adapterStrategy = new Mock<IStrategy>();
         adapterStrategy.Setup(s => s.RunStrategy(It.IsAny<object[]>())).Returns(shootableObj.Object);
-        
+
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Adapter.Create", (object[] args) => adapterStrategy.Object.RunStrategy(args)).Execute();
-        
+
         var strategy = new CreateShootCommandStrategy();
 
         var obj = new Mock<IUObject>();
@@ -41,9 +41,9 @@ public class CreateCommandStrategyTests
 
         var adapterStrategy = new Mock<IStrategy>();
         adapterStrategy.Setup(s => s.RunStrategy(It.IsAny<object[]>())).Returns(rotatableObj.Object);
-        
+
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Adapter.Create", (object[] args) => adapterStrategy.Object.RunStrategy(args)).Execute();
-        
+
         var strategy = new CreateRotateCommandStrategy();
 
         var obj = new Mock<IUObject>();
@@ -64,9 +64,9 @@ public class CreateCommandStrategyTests
 
         var adapterStrategy = new Mock<IStrategy>();
         adapterStrategy.Setup(s => s.RunStrategy(It.IsAny<object[]>())).Returns(startMoveObj.Object);
-        
+
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Adapter.Create", (object[] args) => adapterStrategy.Object.RunStrategy(args)).Execute();
-        
+
         var strategy = new CreateStartMoveCommandStrategy();
 
         var obj = new Mock<IUObject>();
@@ -87,9 +87,9 @@ public class CreateCommandStrategyTests
 
         var adapterStrategy = new Mock<IStrategy>();
         adapterStrategy.Setup(s => s.RunStrategy(It.IsAny<object[]>())).Returns(stopMoveObj.Object);
-        
+
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Adapter.Create", (object[] args) => adapterStrategy.Object.RunStrategy(args)).Execute();
-        
+
         var strategy = new CreateStopMoveCommandStrategy();
 
         var obj = new Mock<IUObject>();

@@ -2,7 +2,7 @@ using Hwdtech;
 
 namespace SpaceBattle.Lib;
 
-public class AddHandlerToExceptionTreeCommand: ICommand
+public class AddHandlerToExceptionTreeCommand : ICommand
 {
     private IEnumerable<Type> list;
     private IHandler handler;

@@ -12,7 +12,7 @@ public class MyAngle
     public MyAngle(int n, int m)
     {
         if (m == 0) throw new ArgumentException();
-        if (n >= 0 && m < 0 || n <= 0 && m < 0) 
+        if (n >= 0 && m < 0 || n <= 0 && m < 0)
         {
             m *= -1;
             n *= -1;
@@ -22,13 +22,13 @@ public class MyAngle
         this.m = m / d;
     }
 
-    public static MyAngle operator + (MyAngle a, MyAngle b)
+    public static MyAngle operator +(MyAngle a, MyAngle b)
     {
         int p = a.n * b.m + b.n * a.m;
         int q = a.m * b.m;
         int d = gcd(p, q);
         return new MyAngle(p / d, q / d);
-    } 
+    }
 
     public static bool operator ==(MyAngle a, MyAngle b) => a.n == b.n && a.m == b.m;
 

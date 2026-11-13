@@ -16,7 +16,7 @@ public class ShootCommandTests
         var queue = new Queue<ICommand>();
 
         var cmd = new Mock<ICommand>();
-        cmd.Setup(c => c.Execute()).Callback(() => {});
+        cmd.Setup(c => c.Execute()).Callback(() => { });
 
         var pushCommand = new Mock<ICommand>();
         pushCommand.Setup(c => c.Execute()).Callback(() => queue.Enqueue(cmd.Object)).Verifiable();
@@ -29,13 +29,13 @@ public class ShootCommandTests
 
         var pushStrategy = new Mock<IStrategy>();
         pushStrategy.Setup(s => s.RunStrategy(It.IsAny<Queue<ICommand>>(), It.IsAny<ICommand>())).Returns(pushCommand.Object).Verifiable();
-        
+
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.Get", (object[] args) => queueStrategy.Object.RunStrategy(args)).Execute();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.IUObject.Shoot", (object[] args) => shootStrategy.Object.RunStrategy(args)).Execute();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.Push", (object[] args) => pushStrategy.Object.RunStrategy(args)).Execute();
 
         var obj = new Mock<IShootable>();
-        
+
         var shootCommand = new ShootCommand(obj.Object);
 
         shootCommand.Execute();

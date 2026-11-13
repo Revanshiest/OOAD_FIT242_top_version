@@ -10,7 +10,7 @@ public class CreateMacroCommandStrategyTests
         var mockIEnumCommand = new Mock<IEnumerable<ICommand>>();
 
         var strategy = new CreateMacroCommandStrategy();
-        
+
         Assert.NotNull(strategy.RunStrategy(mockIEnumCommand.Object));
     }
 }

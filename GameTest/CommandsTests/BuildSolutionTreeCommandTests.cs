@@ -12,7 +12,7 @@ public class SolutionTreeTests
         new InitScopeBasedIoCImplementationCommand().Execute();
 
         IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"))).Execute();
-    
+
         var mockStrategyReturnsDict = new Mock<IStrategy>();
         mockStrategyReturnsDict.Setup(x => x.RunStrategy()).Returns(new Dictionary<int, object>());
 
@@ -35,9 +35,9 @@ public class SolutionTreeTests
         Assert.True(t.ContainsKey(9));
         Assert.True(t.ContainsKey(0));
 
-        Assert.True(((IDictionary<int, object>) t[1]).ContainsKey(7));
-        Assert.True(((IDictionary<int, object>) t[1]).ContainsKey(3));
+        Assert.True(((IDictionary<int, object>)t[1]).ContainsKey(7));
+        Assert.True(((IDictionary<int, object>)t[1]).ContainsKey(3));
 
-        Assert.True(((IDictionary<int, object>)((IDictionary<int, object>) t[1])[7]).ContainsKey(9));
-    }  
+        Assert.True(((IDictionary<int, object>)((IDictionary<int, object>)t[1])[7]).ContainsKey(9));
+    }
 }

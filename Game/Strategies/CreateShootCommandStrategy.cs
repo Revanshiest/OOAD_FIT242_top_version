@@ -3,7 +3,7 @@ using Hwdtech;
 
 namespace SpaceBattle.Lib;
 
-public class CreateShootCommandStrategy: IStrategy
+public class CreateShootCommandStrategy : IStrategy
 {
     public object RunStrategy(params object[] args)
     {

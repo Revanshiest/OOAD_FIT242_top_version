@@ -6,7 +6,7 @@ public interface IStartable
     {
         get;
     }
-    
+
     public IDictionary<string, object> Properties
     {
         get;

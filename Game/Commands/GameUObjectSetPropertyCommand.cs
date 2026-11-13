@@ -1,6 +1,6 @@
 namespace SpaceBattle.Lib;
 
-public class GameUObjectSetPropertyCommand: ICommand
+public class GameUObjectSetPropertyCommand : ICommand
 {
     private IUObject obj;
     private string key;

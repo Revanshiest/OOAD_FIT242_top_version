@@ -11,7 +11,7 @@ public class RotateTests
         m.Setup(a => a.Angle).Returns(new MyAngle(45, 1)).Verifiable();
         m.Setup(a => a.AngleSpeed).Returns(new MyAngle(90, 1)).Verifiable();
         var c = new RotateCommand(m.Object);
-        
+
         c.Execute();
 
         m.VerifySet(a => a.Angle = new MyAngle(135, 1), Times.Once);

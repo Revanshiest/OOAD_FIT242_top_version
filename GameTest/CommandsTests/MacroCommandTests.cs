@@ -10,12 +10,12 @@ public class MacroCommandTests
         var mockCommand = new Mock<ICommand>();
         mockCommand.Setup(m => m.Execute()).Verifiable();
 
-        var list = new List<ICommand>(){mockCommand.Object};
+        var list = new List<ICommand>() { mockCommand.Object };
 
         var cmd = new MacroCommand(list);
 
         cmd.Execute();
-        
+
         mockCommand.VerifyAll();
     }
 }

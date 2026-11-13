@@ -11,7 +11,7 @@ public class MoveTests
         m.Setup(a => a.Pos).Returns(new Vector(12, 5)).Verifiable();
         m.Setup(a => a.Speed).Returns(new Vector(-7, 3)).Verifiable();
         var c = new MoveCommand(m.Object);
-        
+
         c.Execute();
 
         m.VerifySet(a => a.Pos = new Vector(5, 8), Times.Once);

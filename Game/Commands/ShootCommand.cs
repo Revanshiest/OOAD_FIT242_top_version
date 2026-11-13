@@ -3,7 +3,7 @@ using Hwdtech;
 namespace SpaceBattle.Lib;
 
 
-public class ShootCommand: ICommand
+public class ShootCommand : ICommand
 {
     private IShootable obj;
     public ShootCommand(IShootable obj)

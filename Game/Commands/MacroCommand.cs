@@ -1,6 +1,6 @@
 namespace SpaceBattle.Lib;
 
-public class MacroCommand: ICommand
+public class MacroCommand : ICommand
 {
     private IEnumerable<ICommand> command_list;
 

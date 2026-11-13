@@ -7,7 +7,7 @@ public interface IRotatable
         get;
         set;
     }
-    
+
     public MyAngle AngleSpeed
     {
         get;

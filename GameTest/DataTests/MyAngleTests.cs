@@ -57,6 +57,6 @@ public class MyAngleTests
     [Fact]
     public void ZeroDenominator_In_Angle()
     {
-        Assert.Throws<ArgumentException>(()=> new MyAngle(1,0));
+        Assert.Throws<ArgumentException>(() => new MyAngle(1, 0));
     }
 }

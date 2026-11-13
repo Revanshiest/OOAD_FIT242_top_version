@@ -17,7 +17,7 @@ public class GameCommand : ICommand
     public void Execute()
     {
         IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", this.scope).Execute();
-        
+
         IoC.Resolve<ICommand>("Game.RunCommands", this.queue).Execute();
     }
 }

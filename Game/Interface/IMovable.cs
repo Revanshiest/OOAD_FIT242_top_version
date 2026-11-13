@@ -6,7 +6,7 @@ public interface IMovable
     {
         get;
     }
-    
+
     public Vector Pos
     {
         get;

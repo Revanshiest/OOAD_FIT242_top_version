@@ -20,7 +20,7 @@ public class CreateContiniousCommandStrategyTests
 
         var mockStrategyReturnsMacroCommand = new Mock<IStrategy>();
         mockStrategyReturnsMacroCommand.Setup(m => m.RunStrategy(It.IsAny<IEnumerable<ICommand>>())).Returns(mockCommand.Object).Verifiable();
-    
+
         var mockStrategyReturnsCommand = new Mock<IStrategy>();
         mockStrategyReturnsMacroCommand.Setup(m => m.RunStrategy(It.IsAny<IUObject>())).Returns(mockCommand.Object).Verifiable();
 
@@ -34,9 +34,9 @@ public class CreateContiniousCommandStrategyTests
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "MyName", (object[] args) => mockStrategyReturnsCommand.Object.RunStrategy(args)).Execute();
 
         var strategy = new CreatePartCommandStrategy();
-        
+
         strategy.RunStrategy("MyName", mockIUObj.Object);
-        
+
         mockStrategyReturnsCommand.VerifyAll();
         mockStrategyReturnsIEnumString.VerifyAll();
     }

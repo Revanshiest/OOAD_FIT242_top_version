@@ -8,7 +8,7 @@ public class GameUObjectSetPropertyCommandTests
     public void SuccessfulGameUObjectSetPropertyCommandExecute()
     {
         var obj = new Mock<IUObject>();
-        obj.Setup(o => o.setProperty(It.IsAny<string>(), It.IsAny<object>())).Callback(() => {}).Verifiable();
+        obj.Setup(o => o.setProperty(It.IsAny<string>(), It.IsAny<object>())).Callback(() => { }).Verifiable();
 
         var gameUObjectSetPropertyCommand = new GameUObjectSetPropertyCommand(obj.Object, "lkf", 5);
 
