@@ -101,6 +101,19 @@ public class VectorTests
     }
 
     [Fact]
+    public void ComparisonNullBranches()
+    {
+        Vector? v1 = new Vector(1, 2);
+        Vector? v2 = null;
+        Vector? v3 = null;
+
+        Assert.False(v1 == v2);
+        Assert.False(v2 == v1);
+        Assert.True(v2 == v3);
+        Assert.True(v1 == v1);
+    }
+
+    [Fact]
     public void ZeroLen()
     {
         Assert.Throws<ArgumentException>(() => new Vector());
