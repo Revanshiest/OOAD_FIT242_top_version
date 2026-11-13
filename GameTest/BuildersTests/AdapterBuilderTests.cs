@@ -1,6 +1,6 @@
 using System.Reflection;
-using Hwdtech;
-using Hwdtech.Ioc;
+using App;
+using App.Scopes;
 using Moq;
 
 namespace SpaceBattle.Lib.Test;
@@ -11,6 +11,8 @@ public interface ICustomTestObject
     Vector Velocity { get; }
     void Fire(int power);
     int Calculate(int a, int b);
+    void Reload();
+    int GetStatus();
 }
 
 public interface IGenericContainer<T>
@@ -18,20 +20,13 @@ public interface IGenericContainer<T>
     T Value { get; set; }
 }
 
-public interface IInterfaceWithCompilationError
-{
-    // Будет использован в тесте на ошибку компиляции
-}
-
 public class AdapterBuilderTests
 {
     public AdapterBuilderTests()
     {
-        new InitScopeBasedIoCImplementationCommand().Execute();
-        IoC.Resolve<Hwdtech.ICommand>(
-            "Scopes.Current.Set",
-            IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"))
-        ).Execute();
+        new InitCommand().Execute();
+        var scope = Ioc.Resolve<object>("IoC.Scope.Create");
+        Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", scope).Execute();
     }
 
     [Fact]
@@ -69,9 +64,9 @@ public class AdapterBuilderTests
         var source = builder.BuildSource();
 
         Assert.Contains("public class SpaceBattle_Lib_IMovableAdapter : SpaceBattle.Lib.IMovable", source);
-        Assert.Contains("IoC.Resolve<SpaceBattle.Lib.Vector>(\"Properties.Speed\", _item)", source);
-        Assert.Contains("IoC.Resolve<SpaceBattle.Lib.Vector>(\"Properties.Pos\", _item)", source);
-        Assert.Contains("IoC.Resolve<ICommand>(\"Properties.Pos.Set\", _item, value).Execute()", source);
+        Assert.Contains("Ioc.Resolve<SpaceBattle.Lib.Vector>(\"Properties.Speed\", _item)", source);
+        Assert.Contains("Ioc.Resolve<SpaceBattle.Lib.Vector>(\"Properties.Pos\", _item)", source);
+        Assert.Contains("Ioc.Resolve<ICommand>(\"Properties.Pos.Set\", _item, value).Execute()", source);
     }
 
     [Fact]
@@ -83,21 +78,18 @@ public class AdapterBuilderTests
 
         var setCommandMock = new Mock<ICommand>();
 
-        IoC.Resolve<Hwdtech.ICommand>(
-            "IoC.Register",
+        new RegisterDependencyCommand(
             "Properties.Pos",
             (object[] args) => expectedPos
         ).Execute();
 
-        IoC.Resolve<Hwdtech.ICommand>(
-            "IoC.Register",
+        new RegisterDependencyCommand(
             "Properties.Speed",
             (object[] args) => expectedSpeed
         ).Execute();
 
         Vector? setPosValue = null;
-        IoC.Resolve<Hwdtech.ICommand>(
-            "IoC.Register",
+        new RegisterDependencyCommand(
             "Properties.Pos.Set",
             (object[] args) =>
             {
@@ -131,8 +123,7 @@ public class AdapterBuilderTests
         var fireCommandMock = new Mock<ICommand>();
 
         int capturedPower = 0;
-        IoC.Resolve<Hwdtech.ICommand>(
-            "IoC.Register",
+        new RegisterDependencyCommand(
             "Properties.Fire",
             (object[] args) =>
             {
@@ -141,10 +132,20 @@ public class AdapterBuilderTests
             }
         ).Execute();
 
-        IoC.Resolve<Hwdtech.ICommand>(
-            "IoC.Register",
+        new RegisterDependencyCommand(
             "Properties.Calculate",
             (object[] args) => (object)((int)args[1] + (int)args[2])
+        ).Execute();
+
+        var reloadCommandMock = new Mock<ICommand>();
+        new RegisterDependencyCommand(
+            "Properties.Reload",
+            (object[] args) => reloadCommandMock.Object
+        ).Execute();
+
+        new RegisterDependencyCommand(
+            "Properties.GetStatus",
+            (object[] args) => 100
         ).Execute();
 
         var builder = new AdapterBuilder().SetInterface(typeof(ICustomTestObject));
@@ -158,6 +159,12 @@ public class AdapterBuilderTests
 
         var sum = adapter.Calculate(10, 15);
         Assert.Equal(25, sum);
+
+        adapter.Reload();
+        reloadCommandMock.Verify(c => c.Execute(), Times.Once);
+
+        var status = adapter.GetStatus();
+        Assert.Equal(100, status);
     }
 
     [Fact]
@@ -180,8 +187,7 @@ public class AdapterBuilderTests
     public void Build_GenericInterface_CompilesSuccessfully()
     {
         var uObjectMock = new Mock<IUObject>();
-        IoC.Resolve<Hwdtech.ICommand>(
-            "IoC.Register",
+        new RegisterDependencyCommand(
             "Properties.Value",
             (object[] args) => "test_value"
         ).Execute();

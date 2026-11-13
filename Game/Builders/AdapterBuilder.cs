@@ -1,6 +1,6 @@
 using System.Reflection;
 using System.Text;
-using Hwdtech;
+using App;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -9,6 +9,8 @@ namespace SpaceBattle.Lib;
 public class AdapterBuilder
 {
     private Type? _targetInterface;
+
+    public string SourceCodeOverride { get; set; } = string.Empty;
 
     public AdapterBuilder SetInterface(Type targetInterface)
     {
@@ -38,12 +40,12 @@ public class AdapterBuilder
         {
             var defName = interfaceType.GetGenericTypeDefinition().FullName!;
             var cleanDef = defName.Substring(0, defName.IndexOf('`'));
-            var args = string.Join("_", interfaceType.GetGenericArguments().Select(t => (t.FullName ?? t.Name).Replace(".", "_")));
+            var args = string.Join("_", interfaceType.GetGenericArguments().Select(t => t.FullName!.Replace(".", "_")));
             typeName = $"{cleanDef}_{args}";
         }
         else
         {
-            typeName = interfaceType.FullName ?? interfaceType.Name;
+            typeName = interfaceType.FullName!;
         }
 
         var sanitized = typeName.Replace(".", "_").Replace("+", "_");
@@ -65,7 +67,7 @@ public class AdapterBuilder
             return $"{cleanName}<{genericArgs}>";
         }
 
-        return (type.FullName ?? type.Name).Replace('+', '.');
+        return type.FullName!.Replace('+', '.');
     }
 
     public string BuildSource()
@@ -80,7 +82,7 @@ public class AdapterBuilder
 
         var sb = new StringBuilder();
         sb.AppendLine("using System;");
-        sb.AppendLine("using Hwdtech;");
+        sb.AppendLine("using App;");
         sb.AppendLine("using SpaceBattle.Lib;");
         sb.AppendLine();
         sb.AppendLine("namespace SpaceBattle.Lib;");
@@ -104,12 +106,12 @@ public class AdapterBuilder
 
             if (prop.CanRead)
             {
-                sb.AppendLine($"        get => IoC.Resolve<{propTypeName}>(\"Properties.{prop.Name}\", _item);");
+                sb.AppendLine($"        get => Ioc.Resolve<{propTypeName}>(\"Properties.{prop.Name}\", _item);");
             }
 
             if (prop.CanWrite)
             {
-                sb.AppendLine($"        set => IoC.Resolve<ICommand>(\"Properties.{prop.Name}.Set\", _item, value).Execute();");
+                sb.AppendLine($"        set => Ioc.Resolve<ICommand>(\"Properties.{prop.Name}.Set\", _item, value).Execute();");
             }
 
             sb.AppendLine("    }");
@@ -133,11 +135,11 @@ public class AdapterBuilder
 
             if (method.ReturnType == typeof(void))
             {
-                sb.AppendLine($"        IoC.Resolve<ICommand>(\"Properties.{method.Name}\", _item{argList}).Execute();");
+                sb.AppendLine($"        Ioc.Resolve<ICommand>(\"Properties.{method.Name}\", _item{argList}).Execute();");
             }
             else
             {
-                sb.AppendLine($"        return IoC.Resolve<{returnTypeName}>(\"Properties.{method.Name}\", _item{argList});");
+                sb.AppendLine($"        return Ioc.Resolve<{returnTypeName}>(\"Properties.{method.Name}\", _item{argList});");
             }
 
             sb.AppendLine("    }");
@@ -146,8 +148,6 @@ public class AdapterBuilder
         sb.AppendLine("}");
         return sb.ToString();
     }
-
-    public string SourceCodeOverride { get; set; } = string.Empty;
 
     public Type Build()
     {
@@ -165,7 +165,7 @@ public class AdapterBuilder
             typeof(object).Assembly,
             typeof(Console).Assembly,
             typeof(IUObject).Assembly,
-            typeof(IoC).Assembly,
+            typeof(Ioc).Assembly,
             _targetInterface.Assembly,
             Assembly.Load("System.Runtime")
         };
@@ -185,7 +185,6 @@ public class AdapterBuilder
         }
 
         var references = referencedAssemblies
-            .Where(a => !a.IsDynamic && !string.IsNullOrEmpty(a.Location))
             .Select(a => MetadataReference.CreateFromFile(a.Location))
             .Cast<MetadataReference>()
             .ToList();
@@ -198,8 +197,7 @@ public class AdapterBuilder
 
         if (!result.Success)
         {
-            var failures = result.Diagnostics.Where(diagnostic =>
-                diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error);
+            var failures = result.Diagnostics.Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error);
 
             var errorMsg = new StringBuilder();
             errorMsg.AppendLine("Failed to compile dynamic adapter:");
@@ -217,8 +215,6 @@ public class AdapterBuilder
         var assembly = Assembly.Load(ms.ToArray());
         var className = GetAdapterClassName(_targetInterface);
         var fullClassName = $"SpaceBattle.Lib.{className}";
-        var compiledType = assembly.GetType(fullClassName);
-
-        return compiledType ?? throw new InvalidOperationException($"Compiled type '{fullClassName}' was not found in generated assembly.");
+        return assembly.GetType(fullClassName)!;
     }
 }
