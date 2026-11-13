@@ -1,8 +1,8 @@
 name: CI for Checkstyle and Test Coverage
 
 env:
-  SOLUTION: 'Game.sln'
-  TESTS: 'Tests/Tests.csproj'
+  SOLUTION: 'SpaceBattle.sln'
+  TESTS: 'GameTest/SpaceBattle.Lib.Test.csproj'
 
 on:
   pull_request:
