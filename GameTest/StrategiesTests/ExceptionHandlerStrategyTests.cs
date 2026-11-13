@@ -1,5 +1,5 @@
-using Hwdtech;
-using Hwdtech.Ioc;
+using App;
+using App.Scopes;
 
 using Moq;
 
@@ -13,9 +13,9 @@ public class ExceptionHandlerStrategyTests
     List<Type> listThatHashNotInTree = new List<Type>() { typeof(IOException), typeof(ArgumentException) };
     public ExceptionHandlerStrategyTests()
     {
-        new InitScopeBasedIoCImplementationCommand().Execute();
-
-        IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"))).Execute();
+        new InitCommand().Execute();
+        var scope = Ioc.Resolve<object>("IoC.Scope.Create");
+        Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", scope).Execute();
 
         var mockHandler = new Mock<IHandler>();
 
@@ -36,8 +36,8 @@ public class ExceptionHandlerStrategyTests
         mockStrategyReturnsHash.Setup(m => m.RunStrategy(listWithOneException)).Returns(12345);
         mockStrategyReturnsHash.Setup(m => m.RunStrategy(listThatHashNotInTree)).Returns(4);
 
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetExceptionTree", (object[] args) => mockStrategyReturnsExseptionTree.Object.RunStrategy(args)).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetHashCode", (object[] args) => mockStrategyReturnsHash.Object.RunStrategy(args)).Execute();
+        new RegisterDependencyCommand("Game.GetExceptionTree", (object[] args) => mockStrategyReturnsExseptionTree.Object.RunStrategy(args)).Execute();
+        new RegisterDependencyCommand("Game.GetHashCode", (object[] args) => mockStrategyReturnsHash.Object.RunStrategy(args)).Execute();
     }
 
     [Fact]

@@ -1,5 +1,5 @@
-using Hwdtech;
-using Hwdtech.Ioc;
+using App;
+using App.Scopes;
 
 using Moq;
 
@@ -9,9 +9,9 @@ public class AddExceptionHandlerStrategyTests
 {
     public AddExceptionHandlerStrategyTests()
     {
-        new InitScopeBasedIoCImplementationCommand().Execute();
-
-        IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"))).Execute();
+        new InitCommand().Execute();
+        var scope = Ioc.Resolve<object>("IoC.Scope.Create");
+        Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", scope).Execute();
 
         var mockHandler = new Mock<IHandler>();
 
@@ -28,8 +28,8 @@ public class AddExceptionHandlerStrategyTests
 
         var StrategyReturnsHash = new GetHashCodeStrategy();
 
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetExceptionTree", (object[] args) => mockStrategyReturnsExseptionTree.Object.RunStrategy(args)).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetHashCode", (object[] args) => StrategyReturnsHash.RunStrategy(args)).Execute();
+        new RegisterDependencyCommand("Game.GetExceptionTree", (object[] args) => mockStrategyReturnsExseptionTree.Object.RunStrategy(args)).Execute();
+        new RegisterDependencyCommand("Game.GetHashCode", (object[] args) => StrategyReturnsHash.RunStrategy(args)).Execute();
     }
 
     [Fact]
@@ -41,6 +41,6 @@ public class AddExceptionHandlerStrategyTests
 
         cmd.Execute();
 
-        Assert.Equal(5, IoC.Resolve<IDictionary<int, IHandler>>("Game.GetExceptionTree").Count);
+        Assert.Equal(5, Ioc.Resolve<IDictionary<int, IHandler>>("Game.GetExceptionTree").Count);
     }
 }

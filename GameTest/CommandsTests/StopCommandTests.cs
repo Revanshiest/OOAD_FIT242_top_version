@@ -1,5 +1,5 @@
-using Hwdtech;
-using Hwdtech.Ioc;
+using App;
+using App.Scopes;
 
 using Moq;
 
@@ -9,9 +9,9 @@ public class StopMoveCommandTests
 {
     public StopMoveCommandTests()
     {
-        new InitScopeBasedIoCImplementationCommand().Execute();
-
-        IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"))).Execute();
+        new InitCommand().Execute();
+        var scope = Ioc.Resolve<object>("IoC.Scope.Create");
+        Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", scope).Execute();
 
         var mockCommand = new Mock<SpaceBattle.Lib.ICommand>();
         mockCommand.Setup(x => x.Execute());
@@ -28,9 +28,9 @@ public class StopMoveCommandTests
         var mockStrategyReturnIInjectable = new Mock<IStrategy>();
         mockStrategyReturnIInjectable.Setup(x => x.RunStrategy(It.IsAny<object[]>())).Returns(mockInject.Object);
 
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.RemoveProperty", (object[] args) => mockStrategyReturnCommand.Object.RunStrategy(args)).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.EmptyCommand", (object[] args) => new EmptyCommand()).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.GetProperty", (object[] args) => mockStrategyReturnIInjectable.Object.RunStrategy(args)).Execute();
+        new RegisterDependencyCommand("Game.Commands.RemoveProperty", (object[] args) => mockStrategyReturnCommand.Object.RunStrategy(args)).Execute();
+        new RegisterDependencyCommand("Game.Commands.EmptyCommand", (object[] args) => new EmptyCommand()).Execute();
+        new RegisterDependencyCommand("Game.Commands.GetProperty", (object[] args) => mockStrategyReturnIInjectable.Object.RunStrategy(args)).Execute();
     }
 
     [Fact]

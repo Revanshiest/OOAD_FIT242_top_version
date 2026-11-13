@@ -1,4 +1,4 @@
-using Hwdtech;
+using App;
 
 namespace SpaceBattle.Lib;
 
@@ -8,8 +8,8 @@ public class FindExceptionHandlerStrategy : IStrategy
     {
         var list = (IEnumerable<Type>)args[0];
 
-        var tree = IoC.Resolve<IDictionary<int, IHandler>>("Game.GetExceptionTree");
+        var tree = Ioc.Resolve<IDictionary<int, IHandler>>("Game.GetExceptionTree");
 
-        return tree.TryGetValue(IoC.Resolve<int>("Game.GetHashCode", list), out IHandler? value) ? value : tree[0];
+        return tree.TryGetValue(Ioc.Resolve<int>("Game.GetHashCode", list), out IHandler? value) ? value : tree[0];
     }
 }

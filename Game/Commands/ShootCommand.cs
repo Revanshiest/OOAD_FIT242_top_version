@@ -1,4 +1,4 @@
-using Hwdtech;
+using App;
 
 namespace SpaceBattle.Lib;
 
@@ -13,7 +13,7 @@ public class ShootCommand : ICommand
 
     public void Execute()
     {
-        IoC.Resolve<ICommand>("Game.Queue.Push", IoC.Resolve<Queue<ICommand>>("Game.Queue.Get"),
-            IoC.Resolve<ICommand>("Game.IUObject.Shoot", obj)).Execute();
+        Ioc.Resolve<ICommand>("Game.Queue.Push", Ioc.Resolve<Queue<ICommand>>("Game.Queue.Get"),
+            Ioc.Resolve<ICommand>("Game.IUObject.Shoot", obj)).Execute();
     }
 }

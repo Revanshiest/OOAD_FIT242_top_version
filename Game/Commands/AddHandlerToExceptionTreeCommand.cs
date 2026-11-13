@@ -1,4 +1,4 @@
-using Hwdtech;
+using App;
 
 namespace SpaceBattle.Lib;
 
@@ -13,9 +13,9 @@ public class AddHandlerToExceptionTreeCommand : ICommand
     }
     public void Execute()
     {
-        var tree = IoC.Resolve<IDictionary<int, IHandler>>("Game.GetExceptionTree");
+        var tree = Ioc.Resolve<IDictionary<int, IHandler>>("Game.GetExceptionTree");
 
-        var key = IoC.Resolve<int>("Game.GetHashCode", list);
+        var key = Ioc.Resolve<int>("Game.GetHashCode", list);
 
         tree.TryAdd(key, handler);
     }

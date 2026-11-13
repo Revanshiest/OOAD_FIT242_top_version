@@ -1,6 +1,6 @@
 using Moq;
-using Hwdtech;
-using Hwdtech.Ioc;
+using App;
+using App.Scopes;
 
 namespace SpaceBattle.Lib.Test;
 
@@ -10,8 +10,9 @@ public class ShootCommandTests
     [Fact]
     public void SuccessfulShootCommandExecute()
     {
-        new InitScopeBasedIoCImplementationCommand().Execute();
-        IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"))).Execute();
+        new InitCommand().Execute();
+        var scope = Ioc.Resolve<object>("IoC.Scope.Create");
+        Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", scope).Execute();
 
         var queue = new Queue<ICommand>();
 
@@ -30,9 +31,9 @@ public class ShootCommandTests
         var pushStrategy = new Mock<IStrategy>();
         pushStrategy.Setup(s => s.RunStrategy(It.IsAny<Queue<ICommand>>(), It.IsAny<ICommand>())).Returns(pushCommand.Object).Verifiable();
 
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.Get", (object[] args) => queueStrategy.Object.RunStrategy(args)).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.IUObject.Shoot", (object[] args) => shootStrategy.Object.RunStrategy(args)).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.Push", (object[] args) => pushStrategy.Object.RunStrategy(args)).Execute();
+        new RegisterDependencyCommand("Game.Queue.Get", (object[] args) => queueStrategy.Object.RunStrategy(args)).Execute();
+        new RegisterDependencyCommand("Game.IUObject.Shoot", (object[] args) => shootStrategy.Object.RunStrategy(args)).Execute();
+        new RegisterDependencyCommand("Game.Queue.Push", (object[] args) => pushStrategy.Object.RunStrategy(args)).Execute();
 
         var obj = new Mock<IShootable>();
 

@@ -1,5 +1,5 @@
-using Hwdtech;
-using Hwdtech.Ioc;
+using App;
+using App.Scopes;
 using Moq;
 
 namespace SpaceBattle.Lib.Test;
@@ -10,9 +10,9 @@ public class GameCommandTests
     [Fact]
     public void SuccessfulGameCommandExecute()
     {
-        new InitScopeBasedIoCImplementationCommand().Execute();
-        var scope = IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"));
-        IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", scope).Execute();
+        new InitCommand().Execute();
+        var scope = Ioc.Resolve<object>("IoC.Scope.Create");
+        Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", scope).Execute();
 
         var queue = new Queue<ICommand>();
 
@@ -22,16 +22,16 @@ public class GameCommandTests
         var runCommandsStrategy = new Mock<IStrategy>();
         runCommandsStrategy.Setup(s => s.RunStrategy(It.IsAny<Queue<ICommand>>())).Returns(cmd.Object).Verifiable();
 
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.RunCommands", (object[] args) => runCommandsStrategy.Object.RunStrategy(args)).Execute();
+        new RegisterDependencyCommand("Game.RunCommands", (object[] args) => runCommandsStrategy.Object.RunStrategy(args)).Execute();
 
         var game = new GameCommand(queue, scope);
 
-        var scopeNew = IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"));
-        IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", scopeNew).Execute();
+        var scopeNew = Ioc.Resolve<object>("IoC.Scope.Create");
+        Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", scopeNew).Execute();
 
         game.Execute();
 
-        Assert.True(scope == IoC.Resolve<object>("Scopes.Current"));
+        Assert.True(scope == Ioc.Resolve<object>("IoC.Scope.Current"));
         cmd.VerifyAll();
         runCommandsStrategy.VerifyAll();
     }

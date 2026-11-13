@@ -1,4 +1,4 @@
-using Hwdtech;
+using App;
 
 namespace SpaceBattle.Lib;
 
@@ -13,7 +13,7 @@ public class BuildSolutionTreeCommand : ICommand
     {
         var parametrs = File.ReadAllLines(path).ToList().Select(line => line.Split(" ").Select(int.Parse).ToList()).ToList();
 
-        var tree = IoC.Resolve<IDictionary<int, object>>("Game.GetSolutionTree");
+        var tree = Ioc.Resolve<IDictionary<int, object>>("Game.GetSolutionTree");
 
         parametrs.ForEach(list =>
         {

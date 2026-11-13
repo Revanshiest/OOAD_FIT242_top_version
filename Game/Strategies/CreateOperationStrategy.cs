@@ -1,4 +1,4 @@
-using Hwdtech;
+using App;
 
 namespace SpaceBattle.Lib;
 
@@ -10,10 +10,10 @@ public class CreateOperationStrategy : IStrategy
         var obj = (IUObject)args[0];
         var orderType = (string)args[1];
 
-        var ruleList = IoC.Resolve<IEnumerable<string>>("Game.Rules.Get." + orderType);
+        var ruleList = Ioc.Resolve<IEnumerable<string>>("Game.Rules.Get." + orderType);
 
-        var commandList = ruleList.ToList().Select(rule => IoC.Resolve<ICommand>("Game.Command.Create." + rule, obj));
+        var commandList = ruleList.ToList().Select(rule => Ioc.Resolve<ICommand>("Game.Command.Create." + rule, obj));
 
-        return IoC.Resolve<ICommand>("Game.Command.Macro.Create", commandList);
+        return Ioc.Resolve<ICommand>("Game.Command.Macro.Create", commandList);
     }
 }

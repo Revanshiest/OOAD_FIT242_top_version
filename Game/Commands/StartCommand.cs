@@ -1,4 +1,4 @@
-using Hwdtech;
+using App;
 
 namespace SpaceBattle.Lib;
 
@@ -12,12 +12,12 @@ public class StartCommand : ICommand
 
     public void Execute()
     {
-        obj.Properties.ToList().ForEach(o => IoC.Resolve<ICommand>("Game.Commands.SetProperty", obj.Target, o.Key, o.Value).Execute());
+        obj.Properties.ToList().ForEach(o => Ioc.Resolve<ICommand>("Game.Commands.SetProperty", obj.Target, o.Key, o.Value).Execute());
 
-        ICommand cmd = IoC.Resolve<ICommand>("Game.Operations.Moving", obj.Target);
+        ICommand cmd = Ioc.Resolve<ICommand>("Game.Operations.Moving", obj.Target);
 
-        IoC.Resolve<ICommand>("Game.Commands.SetProperty", obj.Target, "Moving", cmd).Execute();
+        Ioc.Resolve<ICommand>("Game.Commands.SetProperty", obj.Target, "Moving", cmd).Execute();
 
-        IoC.Resolve<ICommand>("Game.Queue.Push", IoC.Resolve<Queue<ICommand>>("Game.Queue"), cmd).Execute();
+        Ioc.Resolve<ICommand>("Game.Queue.Push", Ioc.Resolve<Queue<ICommand>>("Game.Queue"), cmd).Execute();
     }
 }

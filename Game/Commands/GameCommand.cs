@@ -1,4 +1,4 @@
-using Hwdtech;
+using App;
 
 namespace SpaceBattle.Lib;
 
@@ -16,8 +16,8 @@ public class GameCommand : ICommand
 
     public void Execute()
     {
-        IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", this.scope).Execute();
+        Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", this.scope).Execute();
 
-        IoC.Resolve<ICommand>("Game.RunCommands", this.queue).Execute();
+        Ioc.Resolve<ICommand>("Game.RunCommands", this.queue).Execute();
     }
 }

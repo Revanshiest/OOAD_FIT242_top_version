@@ -1,5 +1,5 @@
-using Hwdtech.Ioc;
-using Hwdtech;
+using App;
+using App.Scopes;
 
 using Moq;
 
@@ -9,9 +9,9 @@ public class DetectCollisionCommandTests
 {
     public DetectCollisionCommandTests()
     {
-        new InitScopeBasedIoCImplementationCommand().Execute();
-
-        IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"))).Execute();
+        new InitCommand().Execute();
+        var scope = Ioc.Resolve<object>("IoC.Scope.Create");
+        Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", scope).Execute();
 
         var tree = new Dictionary<int, object>()
         {
@@ -24,8 +24,8 @@ public class DetectCollisionCommandTests
         var mockStrategyReturnsList = new Mock<IStrategy>();
         mockStrategyReturnsList.Setup(m => m.RunStrategy(It.IsAny<IUObject>())).Returns(new List<int>());
 
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetSolutionTree", (object[] args) => mockStrategyReturnsTree.Object.RunStrategy(args)).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.IUObject.UnionPropertiesForCollision", (object[] args) => mockStrategyReturnsList.Object.RunStrategy(args)).Execute();
+        new RegisterDependencyCommand("Game.GetSolutionTree", (object[] args) => mockStrategyReturnsTree.Object.RunStrategy(args)).Execute();
+        new RegisterDependencyCommand("Game.IUObject.UnionPropertiesForCollision", (object[] args) => mockStrategyReturnsList.Object.RunStrategy(args)).Execute();
     }
 
     [Fact]
@@ -37,8 +37,8 @@ public class DetectCollisionCommandTests
         var cmd = new Mock<ICommand>();
         cmd.Setup(m => m.Execute()).Verifiable();
 
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.PrepareDataToCollision", (object[] args) => new List<int>() { 2 }).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Collision", (object[] args) => cmd.Object).Execute();
+        new RegisterDependencyCommand("Game.PrepareDataToCollision", (object[] args) => new List<int>() { 2 }).Execute();
+        new RegisterDependencyCommand("Game.Collision", (object[] args) => cmd.Object).Execute();
 
         var detect = new DetectCollisionCommand(obj1.Object, obj2.Object);
         detect.Execute();
@@ -55,8 +55,8 @@ public class DetectCollisionCommandTests
         var cmd = new Mock<ICommand>();
         cmd.Setup(m => m.Execute()).Verifiable();
 
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.PrepareDataToCollision", (object[] args) => new List<int>() { 3 }).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Collision", (object[] args) => cmd.Object).Execute();
+        new RegisterDependencyCommand("Game.PrepareDataToCollision", (object[] args) => new List<int>() { 3 }).Execute();
+        new RegisterDependencyCommand("Game.Collision", (object[] args) => cmd.Object).Execute();
 
         var detect = new DetectCollisionCommand(obj1.Object, obj2.Object);
         detect.Execute();

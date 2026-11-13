@@ -1,5 +1,5 @@
-using Hwdtech;
-using Hwdtech.Ioc;
+using App;
+using App.Scopes;
 
 using Moq;
 
@@ -9,9 +9,9 @@ public class StartMoveCommandTests
 {
     public StartMoveCommandTests()
     {
-        new InitScopeBasedIoCImplementationCommand().Execute();
-
-        IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"))).Execute();
+        new InitCommand().Execute();
+        var scope = Ioc.Resolve<object>("IoC.Scope.Create");
+        Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", scope).Execute();
 
         var mockCommand = new Mock<SpaceBattle.Lib.ICommand>();
         mockCommand.Setup(x => x.Execute());
@@ -22,10 +22,10 @@ public class StartMoveCommandTests
         var mockStrategyReturnsQueue = new Mock<IStrategy>();
         mockStrategyReturnsQueue.Setup(x => x.RunStrategy()).Returns(new Queue<SpaceBattle.Lib.ICommand>());
 
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.SetProperty", (object[] args) => mockStrategyReturnsCommand.Object.RunStrategy(args)).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Operations.Moving", (object[] args) => mockStrategyReturnsCommand.Object.RunStrategy(args)).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.Push", (object[] args) => mockStrategyReturnsCommand.Object.RunStrategy(args)).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue", (object[] args) => mockStrategyReturnsQueue.Object.RunStrategy()).Execute();
+        new RegisterDependencyCommand("Game.Commands.SetProperty", (object[] args) => mockStrategyReturnsCommand.Object.RunStrategy(args)).Execute();
+        new RegisterDependencyCommand("Game.Operations.Moving", (object[] args) => mockStrategyReturnsCommand.Object.RunStrategy(args)).Execute();
+        new RegisterDependencyCommand("Game.Queue.Push", (object[] args) => mockStrategyReturnsCommand.Object.RunStrategy(args)).Execute();
+        new RegisterDependencyCommand("Game.Queue", (object[] args) => mockStrategyReturnsQueue.Object.RunStrategy()).Execute();
     }
 
     [Fact]

@@ -1,5 +1,5 @@
-using Hwdtech;
-using Hwdtech.Ioc;
+using App;
+using App.Scopes;
 
 using Moq;
 
@@ -10,9 +10,9 @@ public class CreateContiniousCommandStrategyTests
     [Fact]
     public void SuccesfulCreateContiniousCommandRunStrategy()
     {
-        new InitScopeBasedIoCImplementationCommand().Execute();
-
-        IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"))).Execute();
+        new InitCommand().Execute();
+        var scope = Ioc.Resolve<object>("IoC.Scope.Create");
+        Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", scope).Execute();
 
         var mockCommand = new Mock<ICommand>();
 
@@ -29,9 +29,9 @@ public class CreateContiniousCommandStrategyTests
         var mockStrategyReturnsIEnumString = new Mock<IStrategy>();
         mockStrategyReturnsIEnumString.Setup(m => m.RunStrategy()).Returns(mockIEnumString.Object).Verifiable();
 
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "SetupOperation.MyName", (object[] args) => mockStrategyReturnsIEnumString.Object.RunStrategy(args)).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "CreateMacroCommand", (object[] args) => mockStrategyReturnsMacroCommand.Object.RunStrategy(args)).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "MyName", (object[] args) => mockStrategyReturnsCommand.Object.RunStrategy(args)).Execute();
+        new RegisterDependencyCommand("SetupOperation.MyName", (object[] args) => mockStrategyReturnsIEnumString.Object.RunStrategy(args)).Execute();
+        new RegisterDependencyCommand("CreateMacroCommand", (object[] args) => mockStrategyReturnsMacroCommand.Object.RunStrategy(args)).Execute();
+        new RegisterDependencyCommand("MyName", (object[] args) => mockStrategyReturnsCommand.Object.RunStrategy(args)).Execute();
 
         var strategy = new CreatePartCommandStrategy();
 
